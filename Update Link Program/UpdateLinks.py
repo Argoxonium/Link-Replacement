@@ -1,6 +1,7 @@
 from docx import Document
 import csv
 import re
+import requests
 
 def main():
     # Example usage
@@ -73,8 +74,8 @@ def create_new_link(updated_link:str, links:dict) -> dict:
 
     #loop through each item in my dict and pull information needed and create a new dict compairing new and old links.
     for text, link in links.items():
-        link_piece:str = pull_relative_info(link) #pull info needed
-        new_link:str = f"{updated_link}{link_piece}" #create new link
+        link_piece = pull_relative_info(link) #pull info needed
+        new_link = f"{updated_link}{link_piece}" #create new link
         links_transformed[link] = new_link #add to dict
 
     return links_transformed
@@ -102,6 +103,19 @@ def update_link(doc_path: str, links: dict) -> None:
     # Save the updated document
     doc.save('updated_document.docx')
 
+#test if the link works
+#TODO Update to accept redirects
+def check_link(url):
+    try:
+        response = requests.head(url, allow_redirects=True)
+        # Check if the status code is 200 (OK)
+        if response.status_code == 200:
+            return True
+        else:
+            return False
+    except requests.RequestException as e:
+        print(f"Error checking URL {url}: {e}")
+        return False
 
 if __name__ == "__main__":
     main()
